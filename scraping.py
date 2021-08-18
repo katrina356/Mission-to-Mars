@@ -5,13 +5,14 @@ from bs4 import BeautifulSoup as soup
 import pandas as pd
 import datetime as dt
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.driver import ChromeDriver
 
 
 # create function to scrape all. Set up Splinter. This creates an instance of a splinter browser, using chrome
 def scrape_all():
     # Initiate headless driver for deployment
     executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path, headless=True)
+    browser = Browser('chrome', **executable_path,, headless=True)
 
     # function will return two variables
     news_title, news_paragraph = mars_news(browser)
@@ -92,7 +93,7 @@ def featured_image(browser):
     # Use the base URL to create an absolute URL
     img_url = f'https://spaceimages-mars.com/{img_url_rel}'
     
-    browser.quit()
+    #browser.quit()
     return img_url
 
 
@@ -109,7 +110,8 @@ def mars_facts():
     df.set_index('description', inplace=True)
 
     # insert panda function to convert dataframe back into HTML
-    df.to_html()
+    return df.to_html()
+    
 
 if __name__ == "__main__":
     # If running as script, print scraped data
