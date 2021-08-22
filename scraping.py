@@ -12,7 +12,7 @@ from webdriver_manager.driver import ChromeDriver
 def scrape_all():
     # Initiate headless driver for deployment
     executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path,, headless=True)
+    browser = Browser('chrome', **executable_path, headless=True)
 
     # function will return two variables
     news_title, news_paragraph = mars_news(browser)
@@ -23,7 +23,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "mars": mars_data()
     }
 
     # Stop webdriver and return data
@@ -61,7 +62,7 @@ def mars_news(browser):
     except AttributeError:
         return None, None
     
-    browser.quit()
+    
     return news_title, news_p
 
 
@@ -112,10 +113,46 @@ def mars_facts():
     # insert panda function to convert dataframe back into HTML
     return df.to_html()
     
+def mars_data(browser):
+    
+    url = 'https://marshemispheres.com/'
 
-if __name__ == "__main__":
+    browser.visit(url)
+    
+    hemisphere_image_urls = []
+    
+    for i in range(4):
+        print(i)
+    browser.find_by_tag('h3')[i].click()
+    
+    
+    #parse with soup
+    html = browser.html
+    hem_soup = soup(html, 'html.parser')
+    
+    #Find the image
+    img_link = hem_soup.find('div', class_= "downloads")
+    
+    img_div = (img_link.find('a').get('href'))
+    
+    hemisphere_title = hem_soup.select_one('h2.title').text
+    
+    print(hemisphere_title)
+    
+    #add to a dictionary the img and the title
+    hemisphere_dict = {
+        "img": f'{url}{img_div}',
+        "title": hemisphere_title
+      }
+    
+    hemisphere_image_urls.append(hemisphere_dict)
+    browser.back()
+    
+    return mars_data
+
+#if __name__ == "__main__":
     # If running as script, print scraped data
-    print(scrape_all())
+    #print(scrape_all())
     
 
 
